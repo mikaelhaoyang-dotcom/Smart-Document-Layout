@@ -1,0 +1,315 @@
+
+<div class="h-screen flex flex-col bg-slate-100 overflow-hidden font-sans">
+
+  <!-- Top Navigation -->
+  <header class="bg-blue-900 text-white p-4 shadow-md flex justify-between items-center z-10 shrink-0">
+    <div class="flex items-center gap-3">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+      <h1 class="text-xl font-bold tracking-wide">智能论文排版助手 <span class="text-blue-300 text-sm font-normal ml-2">专业版</span></h1>
+    </div>
+    <button (click)="downloadDoc()" class="bg-yellow-500 hover:bg-yellow-600 text-blue-900 font-bold py-2 px-6 rounded shadow-lg transition-transform active:scale-95 flex items-center gap-2">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+      导出 Word
+    </button>
+  </header>
+
+  <!-- Main Workspace -->
+  <div class="flex flex-1 overflow-hidden">
+    
+    <!-- LEFT PANEL: Controls -->
+    <div class="w-1/3 min-w-[320px] bg-white border-r border-slate-200 flex flex-col z-0 shadow-lg">
+      
+      <!-- Tabs -->
+      <div class="flex border-b border-slate-200 bg-slate-50">
+        <button 
+          (click)="setActiveTab('config')" 
+          class="flex-1 py-3 text-sm font-semibold text-center transition-colors border-b-2"
+          [class.border-blue-800]="activeTab() === 'config'"
+          [class.text-blue-900]="activeTab() === 'config'"
+          [class.text-slate-500]="activeTab() !== 'config'"
+          [class.border-transparent]="activeTab() !== 'config'"
+        >
+          1. 格式配置
+        </button>
+        <button 
+          (click)="setActiveTab('content')" 
+          class="flex-1 py-3 text-sm font-semibold text-center transition-colors border-b-2"
+          [class.border-blue-800]="activeTab() === 'content'"
+          [class.text-blue-900]="activeTab() === 'content'"
+          [class.text-slate-500]="activeTab() !== 'content'"
+          [class.border-transparent]="activeTab() !== 'content'"
+        >
+          2. 内容录入
+        </button>
+      </div>
+
+      <!-- Scrollable Panel Content -->
+      <div class="flex-1 overflow-y-auto p-6 space-y-6 bg-white">
+        
+        <!-- === CONFIG TAB === -->
+        @if (activeTab() === 'config') {
+          <!-- Page Margins -->
+          <section class="space-y-3">
+            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 pb-1">页面设置 (cm)</h3>
+            <div class="grid grid-cols-2 gap-4">
+              <div class="space-y-1">
+                <label class="text-xs text-slate-500">上边距</label>
+                <input type="number" [ngModel]="config().margins.top" (ngModelChange)="updateConfig('margins.top', $event)" step="0.1" class="w-full p-2 text-sm border border-slate-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+              </div>
+              <div class="space-y-1">
+                <label class="text-xs text-slate-500">下边距</label>
+                <input type="number" [ngModel]="config().margins.bottom" (ngModelChange)="updateConfig('margins.bottom', $event)" step="0.1" class="w-full p-2 text-sm border border-slate-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+              </div>
+              <div class="space-y-1">
+                <label class="text-xs text-slate-500">左边距</label>
+                <input type="number" [ngModel]="config().margins.left" (ngModelChange)="updateConfig('margins.left', $event)" step="0.1" class="w-full p-2 text-sm border border-slate-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+              </div>
+              <div class="space-y-1">
+                <label class="text-xs text-slate-500">右边距</label>
+                <input type="number" [ngModel]="config().margins.right" (ngModelChange)="updateConfig('margins.right', $event)" step="0.1" class="w-full p-2 text-sm border border-slate-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+              </div>
+            </div>
+          </section>
+
+          <!-- Fonts -->
+          <section class="space-y-3">
+            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 pb-1">字体设置</h3>
+            <div class="grid grid-cols-2 gap-4">
+              <div class="space-y-1">
+                <label class="text-xs text-slate-500">中文字体</label>
+                <select [ngModel]="config().fonts.cn" (ngModelChange)="updateConfig('fonts.cn', $event)" class="w-full p-2 text-sm border border-slate-300 rounded focus:border-blue-500">
+                  <option value="SimSun">宋体 (SimSun)</option>
+                  <option value="SimHei">黑体 (SimHei)</option>
+                  <option value="KaiTi">楷体 (KaiTi)</option>
+                  <option value="Microsoft YaHei">微软雅黑</option>
+                </select>
+              </div>
+              <div class="space-y-1">
+                <label class="text-xs text-slate-500">西文字体</label>
+                <select [ngModel]="config().fonts.en" (ngModelChange)="updateConfig('fonts.en', $event)" class="w-full p-2 text-sm border border-slate-300 rounded focus:border-blue-500">
+                  <option value="Times New Roman">Times New Roman</option>
+                  <option value="Arial">Arial</option>
+                  <option value="Calibri">Calibri</option>
+                </select>
+              </div>
+            </div>
+          </section>
+
+          <!-- Styles -->
+          <section class="space-y-4">
+            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 pb-1">段落样式</h3>
+            
+            <!-- Title Style -->
+            <div class="bg-slate-50 p-3 rounded border border-slate-200">
+              <label class="block text-sm font-bold text-slate-700 mb-2">论文题目</label>
+              <div class="flex gap-2 items-center">
+                <select [ngModel]="config().title.size" (ngModelChange)="updateConfig('title.size', $event)" class="p-1 border rounded text-xs bg-white">
+                  <option value="小二">小二</option>
+                  <option value="二号">二号</option>
+                  <option value="三号">三号</option>
+                </select>
+                <label class="flex items-center gap-1 text-xs cursor-pointer">
+                  <input type="checkbox" [ngModel]="config().title.bold" (ngModelChange)="updateConfig('title.bold', $event)"> 加粗
+                </label>
+                <label class="flex items-center gap-1 text-xs cursor-pointer">
+                  <input type="checkbox" [ngModel]="config().title.center" (ngModelChange)="updateConfig('title.center', $event)"> 居中
+                </label>
+              </div>
+            </div>
+
+            <!-- Abstract Style -->
+            <div class="bg-slate-50 p-3 rounded border border-slate-200">
+              <label class="block text-sm font-bold text-slate-700 mb-2">摘要/关键词</label>
+              <div class="flex gap-2 items-center">
+                <select [ngModel]="config().abstract.size" (ngModelChange)="updateConfig('abstract.size', $event)" class="p-1 border rounded text-xs bg-white">
+                  <option value="小四">小四</option>
+                  <option value="四号">四号</option>
+                  <option value="五号">五号</option>
+                </select>
+                <label class="flex items-center gap-1 text-xs cursor-pointer">
+                  <input type="checkbox" [ngModel]="config().abstract.titleBold" (ngModelChange)="updateConfig('abstract.titleBold', $event)"> 标题加粗
+                </label>
+              </div>
+            </div>
+
+            <!-- Body Style -->
+            <div class="bg-slate-50 p-3 rounded border border-slate-200">
+              <label class="block text-sm font-bold text-slate-700 mb-2">正文内容</label>
+              <div class="flex flex-col gap-2">
+                <div class="flex gap-2 items-center">
+                  <select [ngModel]="config().body.size" (ngModelChange)="updateConfig('body.size', $event)" class="p-1 border rounded text-xs bg-white">
+                    <option value="小四">小四</option>
+                    <option value="四号">四号</option>
+                    <option value="五号">五号</option>
+                  </select>
+                  <label class="flex items-center gap-1 text-xs cursor-pointer" title="通常正文不加粗，只有标题加粗">
+                    <input type="checkbox" [ngModel]="config().body.bold" (ngModelChange)="updateConfig('body.bold', $event)"> 全文加粗
+                  </label>
+                </div>
+                <div class="flex items-center gap-2">
+                  <label class="text-xs text-slate-500">行距</label>
+                  <input type="number" [ngModel]="config().body.lineSpacing" (ngModelChange)="updateConfig('body.lineSpacing', $event)" step="0.1" class="w-16 p-1 text-xs border rounded">
+                  <span class="text-xs text-slate-400">倍</span>
+                </div>
+              </div>
+            </div>
+
+             <!-- References Style -->
+             <div class="bg-slate-50 p-3 rounded border border-slate-200">
+              <label class="block text-sm font-bold text-slate-700 mb-2">参考文献</label>
+              <div class="flex flex-col gap-2">
+                <div class="flex gap-2 items-center">
+                  <span class="text-xs text-slate-500 w-8">标题</span>
+                  <select [ngModel]="config().references.titleSize" (ngModelChange)="updateConfig('references.titleSize', $event)" class="p-1 border rounded text-xs bg-white">
+                    <option value="小四">小四</option>
+                    <option value="四号">四号</option>
+                    <option value="五号">五号</option>
+                  </select>
+                  <label class="flex items-center gap-1 text-xs cursor-pointer">
+                    <input type="checkbox" [ngModel]="config().references.titleBold" (ngModelChange)="updateConfig('references.titleBold', $event)"> 加粗
+                  </label>
+                </div>
+                <div class="flex gap-2 items-center">
+                  <span class="text-xs text-slate-500 w-8">内容</span>
+                  <select [ngModel]="config().references.contentSize" (ngModelChange)="updateConfig('references.contentSize', $event)" class="p-1 border rounded text-xs bg-white">
+                    <option value="小四">小四</option>
+                    <option value="四号">四号</option>
+                    <option value="五号">五号</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+          </section>
+        }
+
+        <!-- === CONTENT TAB === -->
+        @if (activeTab() === 'content') {
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-500 mb-1">论文题目</label>
+              <input type="text" [ngModel]="content().title" (ngModelChange)="updateContent('title', $event)" class="w-full p-2 border border-slate-300 rounded text-sm focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-500 mb-1">摘要</label>
+              <textarea [ngModel]="content().abstract" (ngModelChange)="updateContent('abstract', $event)" rows="4" class="w-full p-2 border border-slate-300 rounded text-sm focus:ring-2 focus:ring-blue-500"></textarea>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-500 mb-1">关键词 (分号分隔)</label>
+              <input type="text" [ngModel]="content().keywords" (ngModelChange)="updateContent('keywords', $event)" class="w-full p-2 border border-slate-300 rounded text-sm focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-500 mb-1">正文内容</label>
+              <div class="bg-blue-50 text-blue-800 text-xs p-2 rounded mb-1 border border-blue-100">
+                <strong>智能识别：</strong> 以数字 (如 "1.", "1.1", "一、") 开头的行会被识别为标题(加粗、顶格)，普通段落首行缩进两字符。
+              </div>
+              <textarea [ngModel]="content().body" (ngModelChange)="updateContent('body', $event)" rows="15" class="w-full p-2 border border-slate-300 rounded text-sm focus:ring-2 focus:ring-blue-500 font-mono text-xs leading-relaxed"></textarea>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-500 mb-1">参考文献 (每行一条)</label>
+              <textarea [ngModel]="content().refs" (ngModelChange)="updateContent('refs', $event)" rows="6" class="w-full p-2 border border-slate-300 rounded text-sm focus:ring-2 focus:ring-blue-500"></textarea>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL: Preview -->
+    <div class="flex-1 bg-slate-200 overflow-y-auto p-8 relative flex justify-center">
+      <div class="absolute top-4 right-8 bg-slate-800/80 text-white text-[10px] uppercase px-2 py-1 rounded backdrop-blur-sm pointer-events-none">
+        实时预览 (A4 效果)
+      </div>
+
+      <!-- A4 Page Simulation -->
+      <!-- 210mm wide, min-height 297mm -->
+      <div 
+        class="bg-white shadow-2xl min-h-[297mm] w-[210mm] box-border transition-all duration-300 origin-top scale-[0.8] lg:scale-100"
+        [style.padding-top.cm]="config().margins.top"
+        [style.padding-bottom.cm]="config().margins.bottom"
+        [style.padding-left.cm]="config().margins.left"
+        [style.padding-right.cm]="config().margins.right"
+        [style.font-family]="fontFamilyStyle()"
+        [style.color]="'black'"
+      >
+        
+        <!-- 1. Title -->
+        <div 
+          class="mb-4"
+          [style.font-size.pt]="getPt(config().title.size)"
+          [style.font-weight]="config().title.bold ? 'bold' : 'normal'"
+          [style.text-align]="config().title.center ? 'center' : 'left'"
+          [style.line-height]="config().body.lineSpacing"
+        >
+          {{ content().title }}
+        </div>
+
+        <!-- 2. Abstract -->
+        @if (content().abstract) {
+          <div class="mb-2 text-justify" [style.line-height]="config().body.lineSpacing">
+            <span 
+              [style.font-size.pt]="getPt(config().abstract.size)"
+              [style.font-weight]="config().abstract.titleBold ? 'bold' : 'normal'"
+            >摘要：</span>
+            <span 
+              [style.font-size.pt]="getPt(config().abstract.size)"
+            >{{ content().abstract }}</span>
+          </div>
+        }
+
+        <!-- 3. Keywords -->
+        @if (content().keywords) {
+          <div class="mb-4 text-justify" [style.line-height]="config().body.lineSpacing">
+            <span 
+              [style.font-size.pt]="getPt(config().abstract.size)"
+              [style.font-weight]="config().abstract.titleBold ? 'bold' : 'normal'"
+            >关键词：</span>
+            <span 
+              [style.font-size.pt]="getPt(config().abstract.size)"
+            >{{ content().keywords }}</span>
+          </div>
+        }
+
+        <!-- 4. Body -->
+        @for (para of bodyParagraphs(); track $index) {
+          <div 
+            class="mb-2 text-justify"
+            [class.indent-[2em]]="!para.isHeading"
+            [style.font-size.pt]="getPt(config().body.size)"
+            [style.line-height]="config().body.lineSpacing"
+            [style.font-weight]="(para.isHeading || config().body.bold) ? 'bold' : 'normal'"
+          >
+            {{ para.text }}
+          </div>
+        }
+
+        <!-- 5. Refs -->
+        @if (content().refs) {
+          <div class="mt-8 pt-4 border-t border-dashed border-slate-300"></div>
+          <div 
+            class="text-center mb-2"
+            [style.font-size.pt]="getPt(config().references.titleSize)"
+            [style.font-weight]="config().references.titleBold ? 'bold' : 'normal'"
+            [style.line-height]="config().body.lineSpacing"
+          >
+            参考文献
+          </div>
+          @for (ref of refList(); track $index) {
+            <div 
+              class="mb-1 text-justify"
+              [style.font-size.pt]="getPt(config().references.contentSize)"
+              [style.line-height]="config().body.lineSpacing"
+            >
+              {{ ref }}
+            </div>
+          }
+        }
+
+      </div>
+    </div>
+
+  </div>
+</div>
